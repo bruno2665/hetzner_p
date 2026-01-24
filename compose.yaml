@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  wireguard:
+    image: linuxserver/wireguard:latest
+    container_name: wireguard
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      # Set to the UID/GID that should own the config files on the host
+      - PUID=1000
+      - PGID=1000
+      # Timezone for container logs
+      - TZ=Europe/Berlin
+      # Replace with your public hostname or IP (used in generated peer configs)
+      - SERVERURL=vpn.example.com
+      - SERVERPORT=51820
+      # Number of peers to generate automatically (adjust as needed)
+      - PEERS=1
+      - PEERDNS=auto
+      # Internal subnet for WireGuard network
+      - INTERNAL_SUBNET=10.13.13.0
+    volumes:
+      - ./config/wireguard:/config
+      - /lib/modules:/lib/modules
+    ports:
+      - 51820:51820/udp
+    restart: unless-stopped
+    sysctls:
+      net.ipv4.conf.all.src_valid_mark: "1"
